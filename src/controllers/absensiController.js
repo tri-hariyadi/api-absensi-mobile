@@ -46,7 +46,7 @@ module.exports = {
       const absent = new Absensi({
         userId: param.userId,
         userName: param.userName,
-        desc: dataAbsent.desc
+        desc: dataAbsent ? dataAbsent.desc : ''
       });
 
       if (!req.file) return res.status(400).send(responseWrapper(null, 'Image out is required', 400));
@@ -85,8 +85,7 @@ module.exports = {
       if (dataAbsents.length <= 0) return res.status(404).send(responseWrapper(null, 'Data absents is not found', 404));
       res.status(200).send(responseWrapper(dataAbsents, 'Successfully get data absents', 200));
     } catch (err) {
-      console.log(err);
-      return res.status(500).send(responseWrapper(null, 'Error internal server', 500));
+      return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
     }
   }
 }

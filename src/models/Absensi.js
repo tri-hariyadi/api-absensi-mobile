@@ -2,33 +2,29 @@ const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Schema;
 
 const absensiScheme = new mongoose.Schema({
-  userId: [{
+  userId: {
     type: ObjectId,
     ref: 'User'
-  }],
+  },
   userName: {
     type: String,
-    required: true
+    required: [true, 'Username is required']
   },
-  // timeIn: {
-  //   type: Date,
-  //   required: true
-  // },
-  // timeOut: {
-  //   type: Timestamp,
-  //   required: true
-  // },
   desc: {
     type: String,
-    required: true
+    required: [true, 'Must include a description work'],
+    default: this.desc
   },
   dateWork: {
     type: Date,
-    required: true
+    required: [true, 'Date work is required'],
+    default: new Date()
   },
-  image: {
+  imageIn: {
     type: String,
-    required: true
+  },
+  imageOut: {
+    type: String,
   },
 }, {
   timestamps: { createdAt: 'timeIn', updatedAt: 'timeOut' },

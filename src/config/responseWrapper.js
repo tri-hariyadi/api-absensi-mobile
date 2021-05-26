@@ -1,5 +1,5 @@
 const responseWrapper = (data, message, status) => ({
-  data: data,
+  result: data,
   message: message,
   status: status
 });

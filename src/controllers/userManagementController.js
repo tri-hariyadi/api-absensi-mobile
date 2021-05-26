@@ -96,6 +96,7 @@ module.exports = {
 
       let error = user.validateSync();
       if (error) {
+        await fs.unlink(path.join(`public/images/${req.file.filename}`));
         handleValidationError(error, res);
       } else {
         param['password'] = bcrypt.hashSync(param.password, 8);

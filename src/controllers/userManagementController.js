@@ -96,7 +96,7 @@ module.exports = {
 
       let error = user.validateSync();
       if (error) {
-        await fs.unlink(path.join(`public/images/${req.file.filename}`));
+        if (req.file.filename) await fs.unlink(path.join(`public/images/${req.file.filename}`));
         handleValidationError(error, res);
       } else {
         param['password'] = bcrypt.hashSync(param.password, 8);
@@ -109,7 +109,8 @@ module.exports = {
         ));
       }
     } catch (err) {
-      await fs.unlink(path.join(`public/images/${req.file.filename}`));
+      console.log(err);
+      if (req.file.filename) await fs.unlink(path.join(`public/images/${req.file.filename}`));
       return res.status(500).send(responseWrapper(null, err, 500));
     }
   },

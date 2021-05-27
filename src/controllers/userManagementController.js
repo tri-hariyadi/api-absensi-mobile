@@ -112,6 +112,7 @@ module.exports = {
       }
     } catch (err) {
       console.log(err);
+      console.log('error disini')
       if (req.file.filename) await fs.unlink(path.join(`public/images/${req.file.filename}`));
       return res.status(500).send(responseWrapper(null, err, 500));
     }

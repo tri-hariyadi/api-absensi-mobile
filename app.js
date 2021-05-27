@@ -5,7 +5,7 @@ const createError = require('http-errors');
 const app = express();
 
 var corsOptions = {
-  origin: "http://localhost:3000"
+  origin: "http://localhost:8081"
 };
 
 app.use(cors(corsOptions));
@@ -15,14 +15,17 @@ app.use(express.urlencoded({
 }));
 app.use(express.json());
 
+require('dotenv').config();
 // database connection  
 require('./initDB');
 
 const userManagement = require('./src/routes/userManagement');
 const absensi = require('./src/routes/absent');
+const kas = require('./src/routes/kas');
 
 app.use('/api/v1/absensiMobile/', userManagement);
 app.use('/api/v1/absensiMobile/', absensi);
+app.use('/api/v1/absensiMobile/', kas);
 
 //404 handler and pass to error handler
 app.use((req, res, next) => {

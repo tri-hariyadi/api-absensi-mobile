@@ -5,9 +5,10 @@ const kasScheme = new mongoose.Schema({
     type: Number,
     required: true
   },
-  time: {
+  date: {
     type: Date,
-    required: true
+    required: true,
+    default: new Date()
   }
 });
 

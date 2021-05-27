@@ -90,7 +90,9 @@ module.exports = {
       });
       let uriImage;
       await Users.findOne({ _id: param.id }, async (err, user) => {
+        console.log(user)
         if (user) uriImage = user.image;
+        if (!user) return res.status(404).send(responseWrapper(null, 'No data user find to update', 404));
         if (err) return res.status(400).send(responseWrapper(null, 'Failed to update user data', 400));
       });
 

@@ -70,52 +70,47 @@ module.exports = {
   },
 
   updateUser: async (req, res, next) => {
-    try {
-      const param = JSON.parse(req.body.data);
-      param['image'] = `images/${req.file.filename}`;
-      const user = new Users({
-        username: param.username,
-        email: param.email,
-        phonenumber: param.phonenumber,
-        password: param.password,
-        organisation: param.organisation,
-        divisi: param.divisi,
-        class: param.class,
-        nim: param.nim,
-        birthDate: param.birthDate,
-        birthPlace: param.birthPlace,
-        gender: param.gender,
-        role: param.role,
-        image: `images/${req.file.filename}`
-      });
-      let uriImage;
-      await Users.findOne({ _id: param.id }, async (err, user) => {
-        console.log(user)
-        if (user) uriImage = user.image;
-        if (!user) return res.status(404).send(responseWrapper(null, 'No data user find to update', 404));
-        if (err) return res.status(400).send(responseWrapper(null, 'Failed to update user data', 400));
-      });
+    const param = JSON.parse(req.body.data);
+    param['image'] = `images/${req.file.filename}`;
+    const newUser = new Users({
+      username: param.username,
+      email: param.email,
+      phonenumber: param.phonenumber,
+      password: param.password,
+      organisation: param.organisation,
+      divisi: param.divisi,
+      class: param.class,
+      nim: param.nim,
+      birthDate: param.birthDate,
+      birthPlace: param.birthPlace,
+      gender: param.gender,
+      role: param.role,
+      image: `images/${req.file.filename}`
+    });
 
-      let error = user.validateSync();
-      if (error) {
-        if (req.file.filename) await fs.unlink(path.join(`public/images/${req.file.filename}`));
-        handleValidationError(error, res);
-      } else {
-        param['password'] = bcrypt.hashSync(param.password, 8);
-        await Users.updateOne({ _id: param.id }, param);
-        if (uriImage) await fs.unlink(path.join(`public/${uriImage}`));
-        res.status(200).send(responseWrapper(
-          { Message: 'Update data User is successfully!' },
-          'Update data User is successfully!',
-          200
-        ));
+    Users.findOne({ _id: param.id }, async (err, user) => {
+      if ((!user || err) && req.file.filename) await fs.unlink(path.join(`public/images/${req.file.filename}`));
+      if (!user) return res.status(404).send(responseWrapper(null, 'No data user find to update', 404));
+      if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+      if (user) {
+        let error = newUser.validateSync();
+        if (error) {
+          if (req.file.filename) await fs.unlink(path.join(`public/images/${req.file.filename}`));
+          handleValidationError(error, res);
+        } else {
+          if (param.password) param['password'] = bcrypt.hashSync(param.password, 8);
+          Users.updateOne({ _id: param.id }, param, async (err, result) => {
+            if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+            if (user.image) await fs.unlink(path.join(`public/${user.image}`));
+            res.status(200).send(responseWrapper(
+              { Message: 'Update data User is successfully!' },
+              'Update data User is successfully!',
+              200
+            ));
+          });
+        }
       }
-    } catch (err) {
-      console.log(err);
-      console.log('error disini')
-      if (req.file.filename) await fs.unlink(path.join(`public/images/${req.file.filename}`));
-      return res.status(500).send(responseWrapper(null, err, 500));
-    }
+    });
   },
 
   getAllUsers: async (req, res, next) => {

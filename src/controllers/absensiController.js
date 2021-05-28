@@ -1,6 +1,7 @@
 const Absensi = require('../models/Absensi');
 const handleValidationError = require('../config/handleValidationError');
 const responseWrapper = require('../config/responseWrapper');
+const config = require('../config/config');
 
 const fs = require('fs-extra');
 const path = require('path');
@@ -13,7 +14,7 @@ module.exports = {
       userName: param.userName,
       desc: param.desc,
       dateWork: param.dateWork,
-      imageIn: `images/${req.file.filename}`
+      imageIn: `${config.API_BASE_URl}images/${req.file.filename}`
     });
     if (!req.file) return res.status(400).send(responseWrapper(null, 'Image In is required', 400));
     let error = absent.validateSync();
@@ -56,7 +57,7 @@ module.exports = {
         if (req.file.filename) await fs.unlink(path.join(`public/images/${req.file.filename}`));
         handleValidationError(error, res);
       } else {
-        param['imageOut'] = `images/${req.file.filename}`;
+        param['imageOut'] = `${config.API_BASE_URl}images/${req.file.filename}`;
         await Absensi.updateOne({ userId: param.userId }, param);
         res.status(200).send(responseWrapper(
           { Message: 'Successfully absent out!' },

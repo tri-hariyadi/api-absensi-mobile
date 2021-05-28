@@ -2,6 +2,7 @@ const Kas = require('../models/Kas');
 const KasTrans = require('../models/KasTransaction');
 const handleValidationError = require('../config/handleValidationError');
 const responseWrapper = require('../config/responseWrapper');
+const config = require('../config/config');
 
 const fs = require('fs-extra');
 const path = require('path');
@@ -45,7 +46,7 @@ module.exports = {
       dateTransaction: param.dateTransaction,
       desc: param.desc,
       status: param.status,
-      proofPayment: req.file.filename ? `images/${req.file.filename}` : ''
+      proofPayment: req.file.filename ? `${config.API_BASE_URl}images/${req.file.filename}` : ''
     });
 
     let error = kasTrans.validateSync();

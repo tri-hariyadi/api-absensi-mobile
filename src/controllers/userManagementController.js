@@ -85,7 +85,7 @@ module.exports = {
       birthPlace: param.birthPlace,
       gender: param.gender,
       role: param.role,
-      image: `images/${req.file.filename}`
+      image: `${config.API_BASE_URl}images/${req.file.filename}`
     });
 
     Users.findOne({ _id: param.id }, async (err, user) => {
@@ -103,7 +103,8 @@ module.exports = {
             if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
             if (user.image) {
               try {
-                await fs.unlink(path.join(`public/${user.image}`));
+                const imageUri = user.image;
+                await fs.unlink(path.join(`public/${imageUri.split('/')[3]}/${imageUri.split('/')[4]}`));
               } catch (err) {
                 console.log(err);
               }

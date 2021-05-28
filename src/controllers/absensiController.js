@@ -1,7 +1,7 @@
 const Absensi = require('../models/Absensi');
 const handleValidationError = require('../config/handleValidationError');
 const responseWrapper = require('../config/responseWrapper');
-const config = require('../config/config');
+const config = require('../config/config').get(process.env.NODE_ENV);
 
 const fs = require('fs-extra');
 const path = require('path');

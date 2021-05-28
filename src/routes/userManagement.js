@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { verifySignUp, authJwt } = require('../middlewares');
-const { uploadSingle, uploadMultiple } = require('../middlewares/multer');
+const { uploadSingle } = require('../middlewares/multer');
 const verifyApiKey = require('../middlewares/verifyApiKey');
 
 const userManagement = require('../controllers/userManagementController');

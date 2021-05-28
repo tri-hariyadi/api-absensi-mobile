@@ -72,6 +72,7 @@ module.exports = {
   updateUser: async (req, res, next) => {
     const param = JSON.parse(req.body.data);
     param['image'] = `images/${req.file.filename}`;
+    console.log(config.API_BASE_URl);
     const newUser = new Users({
       username: param.username,
       email: param.email,

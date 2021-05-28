@@ -101,7 +101,13 @@ module.exports = {
           if (param.password) param['password'] = bcrypt.hashSync(param.password, 8);
           Users.updateOne({ _id: param.id }, param, async (err, result) => {
             if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
-            if (user.image) await fs.unlink(path.join(`public/images/${user.image}`));
+            if (user.image) {
+              try {
+                await fs.unlink(path.join(`public/${user.image}`));
+              } catch (err) {
+                console.log(err);
+              }
+            }
             res.status(200).send(responseWrapper(
               { Message: 'Update data User is successfully!' },
               'Update data User is successfully!',

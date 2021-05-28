@@ -72,7 +72,7 @@ module.exports = {
         userId: req.body.userId,
         userName: req.body.userName
       }, (err, dataKas) => {
-        if (err) return res.status(500).send(responseWrapper(null, 'Can not update data transaction', 500));
+        if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
         if (!dataKas) return res.status(404).send(responseWrapper(null, 'Can not find data transaction', 404));
         if (dataKas) {
           dataKasTransaction = dataKas;

@@ -3,7 +3,7 @@ const path = require("path");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "public/images");
+    cb(null, "https://floating-meadow-53357.herokuapp.com/public/images");
   },
   filename: (req, file, cb) => {
     console.log(file.originalname);

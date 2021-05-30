@@ -18,5 +18,6 @@ router.use(function (req, res, next) {
 router.post('/absent/in', [uploadSingle, verifyApiKey, authJwt.verifyToken], absent.absenIn);
 router.post('/absent/out', [uploadSingle, verifyApiKey, authJwt.verifyToken], absent.absentOut);
 router.post('/absent/getAbsents', [verifyApiKey, authJwt.verifyToken], absent.getDataAbsents);
+router.post('/absent/getAbsentById', [verifyApiKey, authJwt.verifyToken], absent.getDataAbsentById);
 
 module.exports = router;

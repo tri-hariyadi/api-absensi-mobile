@@ -26,6 +26,15 @@ const absensiScheme = new mongoose.Schema({
   imageOut: {
     type: String,
   },
+  status: {
+    type: String,
+    enum: {
+      values: ['1', '2'],
+      message: 'Only 1 and 2 is supported for role field.'
+    },
+    requred: [true, 'Status is required'],
+    default: '1'
+  }
 }, {
   timestamps: { createdAt: 'timeIn', updatedAt: 'timeOut' },
 });

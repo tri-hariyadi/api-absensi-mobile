@@ -57,7 +57,10 @@ module.exports = {
 
         let token = jwt.sign({
           idUser: user.id,
-          username: user.username
+          username: user.username,
+          organisation: user.organisation,
+          division: user.divisi,
+          avatar: user.image
         }, config.SECRET, {
           expiresIn: 86400 // 24 hours
         });
@@ -93,7 +96,7 @@ module.exports = {
       if (!user) return res.status(404).send(responseWrapper(null, 'No data user find to update', 404));
       if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
       if (user) {
-        let error = newUser.validateSync();
+        let error = param.option === 'IS_UPDATE_IMAGE' ? null : newUser.validateSync();
         if (error) {
           if (req.file.filename) await fs.unlink(path.join(`public/images/${req.file.filename}`));
           handleValidationError(error, res);

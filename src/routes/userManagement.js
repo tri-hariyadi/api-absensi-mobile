@@ -5,6 +5,7 @@ const { uploadSingle } = require('../middlewares/multer');
 const verifyApiKey = require('../middlewares/verifyApiKey');
 
 const userManagement = require('../controllers/userManagementController');
+const tokenController = require('../controllers/tokenController');
 
 router.use(function (req, res, next) {
   res.header(
@@ -17,6 +18,7 @@ router.use(function (req, res, next) {
 
 router.post('/register', [verifySignUp.checkDuplicateUsernameOrEmail, verifyApiKey], userManagement.registerUser);
 router.post('/login', verifyApiKey, userManagement.loginUser);
+router.delete('/logout', verifyApiKey, tokenController.revokeToken);
 router.post('/update', [uploadSingle, verifyApiKey], userManagement.updateUser);
 router.post('/getAllUsers', [authJwt.verifyToken, verifyApiKey], userManagement.getAllUsers);
 

@@ -26,10 +26,12 @@ require('./initDB');
 const userManagement = require('./src/routes/userManagement');
 const absensi = require('./src/routes/absent');
 const kas = require('./src/routes/kas');
+const token = require('./src/routes/token');
 
 app.use('/api/v1/absensiMobile/', userManagement);
 app.use('/api/v1/absensiMobile/', absensi);
 app.use('/api/v1/absensiMobile/', kas);
+app.use('/api/v1/absensiMobile/', token);
 
 //404 handler and pass to error handler
 app.use((req, res, next) => {

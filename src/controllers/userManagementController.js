@@ -1,5 +1,6 @@
 const config = require("../config/config").get(process.env.NODE_ENV);
 const Users = require("../models/Users");
+const Tokens = require("../models/Tokens");
 const responseWrapper = require('../config/responseWrapper');
 const handleValidationError = require('../config/handleValidationError');
 
@@ -44,32 +45,40 @@ module.exports = {
   loginUser: async (req, res, next) => {
     Users.findOne({
       email: req.body.email
-    }).exec((err, user) => {
+    }).exec(async (err, user) => {
       if (err) return res.status(500).send(responseWrapper(null, err, 500));
       if (!user) return res.status(404).send(responseWrapper(null, 'Email is not found'));
       if (user) {
-        let passwordIsValid = bcrypt.compareSync(
-          req.body.password,
-          user.password
-        );
-        if (!passwordIsValid)
-          return res.status(401).send(responseWrapper(null, 'Invalid password', 401));
+        const doc = await Tokens.findOne({ userId: user._id });
+        if (!doc) {
+          let passwordIsValid = bcrypt.compareSync(
+            req.body.password,
+            user.password
+          );
+          if (!passwordIsValid) return res.status(401).send(responseWrapper(null, 'Invalid password', 401));
+          let accessToken = jwt.sign({
+            idUser: user.id,
+            username: user.username,
+            organisation: user.organisation,
+            division: user.divisi,
+            avatar: user.image
+          }, config.SECRET, {
+            expiresIn: 300 // 24 hours
+          });
 
-        let token = jwt.sign({
-          idUser: user.id,
-          username: user.username,
-          organisation: user.organisation,
-          division: user.divisi,
-          avatar: user.image
-        }, config.SECRET, {
-          expiresIn: 86400 // 24 hours
-        });
-
-        res.status(200).send(
-          responseWrapper({ accessToken: token }, 'Success Login', 200)
-        );
+          let tokens = new Tokens({
+            token: accessToken,
+            userId: user._id
+          });
+          tokens.save((err, result) => {
+            if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+            res.status(200).send(
+              responseWrapper({ accessToken }, 'Success Login', 200)
+            );
+          });
+        } else res.status(400).send(responseWrapper(null, 'Can not login', 400));
       }
-    })
+    });
   },
 
   updateUser: async (req, res, next) => {

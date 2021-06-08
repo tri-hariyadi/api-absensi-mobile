@@ -26,6 +26,7 @@ const absensiScheme = new mongoose.Schema({
   imageOut: {
     type: String,
   },
+  // 1 => IN; 2 => OUT
   status: {
     type: String,
     enum: {

@@ -7,7 +7,7 @@ const config = require('./src/config/config').get(process.env.NODE_ENV);
 const app = express();
 
 var corsOptions = {
-  origin: process.env.NODE_ENV === 'production' ? config.API_BASE_URl : "http://localhost:8081"
+  origin: process.env.NODE_ENV === 'production' ? config.API_BASE_URl : "http://localhost:8082"
 };
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -50,7 +50,7 @@ app.use((err, req, res, next) => {
 });
 
 // const PORT = process.env.PORT || 8081;
-const PORT = process.env.NODE_ENV === 'production' ? (process.env.PORT || 80) : 8081;
+const PORT = process.env.NODE_ENV === 'production' ? (process.env.PORT || 80) : 8082;
 app.listen(PORT, () => {
   console.log('Server started on port ' + PORT + '...');
 });

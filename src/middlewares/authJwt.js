@@ -11,7 +11,7 @@ verifyToken = (req, res, next) => {
   const bearerToken = bearer[1];
 
   Tokens.findOne({ token: bearerToken }, (err, result) => {
-    // console.log(err);
+    console.log(err);
     // console.log(req);
     // console.log(result);
 

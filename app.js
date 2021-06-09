@@ -3,21 +3,25 @@ const express = require('express');
 const createError = require('http-errors');
 const path = require('path');
 const config = require('./src/config/config').get(process.env.NODE_ENV);
+const bodyParser = require('body-parser')
 
 const app = express();
 
 var corsOptions = {
-  origin: '*'
+  origin: '*',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  exposedHeaders: ['x-auth-token']
 };
 
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors(corsOptions));
 
-app.use(express.urlencoded({
+app.use(bodyParser.urlencoded({
   extended: true
 }));
-app.use(express.json());
+app.use(bodyParser.json());
 
 require('dotenv').config();
 // database connection  

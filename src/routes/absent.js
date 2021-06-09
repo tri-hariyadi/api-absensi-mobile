@@ -9,9 +9,8 @@ const absent = require('../controllers/absensiController');
 router.use(function (req, res, next) {
   res.header(
     "Access-Control-Allow-Headers",
-    "x-access-token, Origin, Content-Type, Accept"
+    "x-access-token, Origin, Content-Type, Accept, X-Api-Key"
   );
-  res.header("Access-Control-Allow-Headers", "X-Api-Key");
   next();
 });
 

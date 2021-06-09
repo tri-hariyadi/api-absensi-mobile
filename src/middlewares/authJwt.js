@@ -19,7 +19,7 @@ verifyToken = (req, res, next) => {
     if (!result) return res.status(401).send({ message: "Invalid token!" });
     if (result) jwt.verify(bearerToken, config.SECRET, (err, decoded) => {
       console.log(err);
-      if (err) return res.status(403).send({ message: "Unauthorized!" });
+      if (err) return res.status(401).send({ message: "Unauthorized!" });
       req.token = bearerToken;
       console.log('req token => ', req.token);
       next();

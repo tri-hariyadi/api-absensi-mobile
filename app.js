@@ -7,7 +7,7 @@ const config = require('./src/config/config').get(process.env.NODE_ENV);
 const app = express();
 
 var corsOptions = {
-  origin: process.env.NODE_ENV === 'production' ? config.API_BASE_URl : "http://localhost:8082"
+  origin: '*'
 };
 
 app.use(express.static(path.join(__dirname, 'public')));

@@ -11,17 +11,11 @@ verifyToken = (req, res, next) => {
   const bearerToken = bearer[1];
 
   Tokens.findOne({ token: bearerToken }, (err, result) => {
-    console.log(err);
-    // console.log(req);
-    // console.log(result);
-
     if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
     if (!result) return res.status(401).send({ message: "Invalid token!" });
     if (result) jwt.verify(bearerToken, config.SECRET, (err, decoded) => {
-      console.log(err);
       if (err) return res.status(401).send({ message: "Unauthorized!" });
       req.token = bearerToken;
-      console.log('req token => ', req.token);
       next();
     });
   });

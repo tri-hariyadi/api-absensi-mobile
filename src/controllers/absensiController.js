@@ -100,5 +100,71 @@ module.exports = {
       if (!result) return res.status(404).send(responseWrapper(null, 'Data user is not found', 404))
       if (result) return res.status(200).send(responseWrapper(result, 'Successfully get data user', 200));
     });
+  },
+
+  getLatestDataAbsent: (req, res, next) => {
+    let today = new Date();
+
+    let endYYYY = today.getFullYear();
+    let endMM = String(today.getMonth() + 1).padStart(2, '0');
+    let endDD = String(today.getDate()).padStart(2, '0');
+
+    today.setMonth(today.getMonth() - 3);
+
+    let startYYYY = today.getFullYear();
+    let startMM = String((today.getMonth() + 1)).padStart(2, '0');
+    let startDD = String(today.getDate()).padStart(2, '0');
+
+    let startDate = `${startYYYY}-${startMM}-${startDD}`;
+    let endDate = `${endYYYY}-${endMM}-${endDD}`;
+
+    let monthArray = [];
+    let mounts = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+    let i = Number(startMM) - 1;
+    while (i < 12) {
+      monthArray.push({ MM: i, MMMM: mounts[i] });
+      if (i === 11 && Number(endMM) - 1 <= 2) i = -1;
+      i++
+      if (i === Number(endMM)) break;
+    }
+
+    Absensi.find({
+      userId: req.body.userId,
+      dateWork: {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate)
+      }
+    }, (err, result) => {
+      const dataAbsents = {}
+      let temp = [];
+      if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+      if (!result || result.length <= 0) return res.status(404).send(responseWrapper(null, 'Data Absents is empty', 404));
+      if (result) {
+        //descending
+        const compare = (a, b) => {
+          if (a.dateWork > b.dateWork) {
+            return -1;
+          }
+          if (a.dateWork < b.dateWork) {
+            return 1;
+          }
+          return 0;
+        }
+        result.sort(compare);
+        result.map((item, idx) => {
+          if (temp.length > 0 && new Date(temp[temp.length - 1].dateWork).getMonth() !== new Date(item.dateWork).getMonth()) temp = [];
+          temp.push(item);
+          monthArray.map(month => {
+            if (new Date(item.dateWork).getMonth() === month.MM) {
+              dataAbsents[month.MMMM] = temp;
+            }
+          });
+        });
+      }
+      res.status(200).send(responseWrapper(dataAbsents, 'Success get data absents', 200));
+    });
   }
 }
+
+

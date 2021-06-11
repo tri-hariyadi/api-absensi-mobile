@@ -1,5 +1,6 @@
 /node_modules
-# /public/images
+/public/images
 package-lock.json
 .env
 ample
+.vercel

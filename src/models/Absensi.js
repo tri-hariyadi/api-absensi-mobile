@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Schema;
 
+const date = new Date()
+const defaultDateWork = 
+`${date.getFullYear()}-${String((date.getMonth() + 1)).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
 const absensiScheme = new mongoose.Schema({
   userId: {
     type: ObjectId,
@@ -18,7 +22,7 @@ const absensiScheme = new mongoose.Schema({
   dateWork: {
     type: Date,
     required: [true, 'Date work is required'],
-    default: new Date()
+    default: defaultDateWork
   },
   imageIn: {
     type: String,

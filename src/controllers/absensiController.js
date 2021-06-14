@@ -162,6 +162,7 @@ module.exports = {
           });
         });
       }
+      if (dataAbsents) dataAbsents[Object.keys(dataAbsents)[0]].sort((a, b) => new Date(b.dateWork) - new Date(a.dateWork));
       res.status(200).send(responseWrapper(dataAbsents, 'Success get data absents', 200));
     });
   }

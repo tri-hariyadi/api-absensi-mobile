@@ -5,71 +5,94 @@ const config = require('../config/config').get(process.env.NODE_ENV);
 
 const fs = require('fs-extra');
 const path = require('path');
+const formidable = require('formidable');
 
 module.exports = {
-  absenIn: async (req, res, next) => {
-    const param = JSON.parse(req.body.data);
-    const absent = new Absensi({
-      userId: param.userId,
-      userName: param.userName,
-      desc: param.desc,
-      dateWork: param.dateWork,
-      imageIn: `${config.API_BASE_URl}images/${req.file.filename}`
-    });
-    if (!req.file) return res.status(400).send(responseWrapper(null, 'Image In is required', 400));
-    let error = absent.validateSync();
-    if (error) {
-      if (req.file.filename) await fs.unlink(path.join(`public/images/${req.file.filename}`));
-      handleValidationError(error, res);
-    }
-    else
-      absent.save(async (err, absensi) => {
-        if (err) {
-          if (req.file.filename) await fs.unlink(path.join(`public/images/${req.file.filename}`));
-          return res.status(500).send(responseWrapper(null, err, 500));
+  absenIn: (req, res, next) => {
+    const form = new formidable.IncomingForm();
+    form.parse(req, (err, fields, files) => {
+      let oldPath = files.file.path;
+      let newPath = files.file.name ? `public/images/${Date.now() + path.extname(files.file.name)}` : null
+      let rawData = fs.readFileSync(oldPath);
+
+      fs.writeFile(newPath, rawData, async (err) => {
+        if (err) return res.status(400).send(responseWrapper(null, 'Something went wrong', 400));
+
+        const param = JSON.parse(fields.data);
+        const absent = new Absensi({
+          userId: param.userId,
+          userName: param.userName,
+          desc: param.desc,
+          dateWork: param.dateWork,
+          imageIn: `${config.API_BASE_URl}images/${newPath.replace('public/images/', '')}`
+        });
+
+        if (!files.file) return res.status(400).send(responseWrapper(null, 'Image In is required', 400));
+        let error = absent.validateSync();
+        if (error) {
+          if (newPath) await fs.unlink(path.join(newPath));
+          handleValidationError(error, res);
         }
-        res.status(200).send(responseWrapper(
-          { Message: 'Successfully absent in!' },
-          'Successfully absent in!',
-          200
-        ));
+        else absent.save(async (err, absensi) => {
+          if (err) {
+            if (newPath) await fs.unlink(path.join(newPath));
+            return res.status(500).send(responseWrapper(null, err, 500));
+          }
+          res.status(200).send(responseWrapper(
+            { Message: 'Successfully absent in!' },
+            'Successfully absent in!',
+            200
+          ));
+        });
       });
+    });
   },
 
   absentOut: async (req, res, next) => {
-    try {
-      const param = JSON.parse(req.body.data);
-      let dataAbsent;
-      await Absensi.findOne(param, (err, absentData) => {
-        if (err) return res.status(400).send(responseWrapper(null, 'Cannot absent out', 400));
-        if (absentData) dataAbsent = absentData;
-      });
-      const absent = new Absensi({
-        userId: param.userId,
-        userName: param.userName,
-        desc: dataAbsent ? dataAbsent.desc : ''
-      });
+    const form = new formidable.IncomingForm();
+    form.parse(req, (err, fields, files) => {
+      if (err) return res.status(400).send(null, 'Something went wrong', 400);
+      let oldPath = files.file.path;
+      let newPath = files.file.name ? `public/images/${Date.now() + path.extname(files.file.name)}` : null;
+      let rawData = fs.readFileSync(oldPath);
 
-      if (!req.file) return res.status(400).send(responseWrapper(null, 'Image out is required', 400));
+      fs.writeFile(newPath, rawData, async (err) => {
+        if (err) return res.status(400).send(responseWrapper(null, 'Something went wrong', 400));
 
-      let error = absent.validateSync();
-      if (error) {
-        if (req.file.filename) await fs.unlink(path.join(`public/images/${req.file.filename}`));
-        handleValidationError(error, res);
-      } else {
-        param['imageOut'] = `${config.API_BASE_URl}images/${req.file.filename}`;
-        param['status'] = '2';
-        await Absensi.updateOne({ userId: param.userId }, param);
-        res.status(200).send(responseWrapper(
-          { Message: 'Successfully absent out!' },
-          'Successfully absent out!',
-          200
-        ));
-      }
-    } catch (err) {
-      await fs.unlink(path.join(`public/images/${req.file.filename}`));
-      return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
-    }
+        const param = JSON.parse(fields.data);
+        let dataAbsent;
+        await Absensi.findOne(param, (err, absentData) => {
+          if (err) return res.status(400).send(responseWrapper(null, 'Cannot absent out', 400));
+          if (absentData) dataAbsent = absentData;
+        });
+        const absent = new Absensi({
+          userId: param.userId,
+          userName: param.userName,
+          desc: dataAbsent ? dataAbsent.desc : ''
+        });
+
+        if (!files.file) return res.status(400).send(responseWrapper(null, 'Image out is required', 400));
+        let error = absent.validateSync();
+        if (error) {
+          if (newPath) await fs.unlink(path.join(newPath));
+          handleValidationError(error, res);
+        } else {
+          param['imageOut'] = `${config.API_BASE_URl}images/${req.file.filename}`;
+          param['status'] = '2';
+          Absensi.updateOne({ userId: param.userId }, param, async (err, result) => {
+            if (err) {
+              await fs.unlink(path.join(newPath));
+              return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+            }
+            res.status(200).send(responseWrapper(
+              { Message: 'Successfully absent out!' },
+              'Successfully absent out!',
+              200
+            ));
+          });
+        }
+      });
+    });
   },
 
   getDataAbsents: async (req, res, next) => {

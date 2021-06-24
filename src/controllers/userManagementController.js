@@ -4,8 +4,9 @@ const Tokens = require("../models/Tokens");
 const responseWrapper = require('../config/responseWrapper');
 const handleValidationError = require('../config/handleValidationError');
 
-var jwt = require("jsonwebtoken");
-var bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const formidable = require('formidable');
 const fs = require('fs-extra');
 const path = require('path');
 
@@ -82,53 +83,64 @@ module.exports = {
   },
 
   updateUser: async (req, res, next) => {
-    const param = JSON.parse(req.body.data);
-    param['image'] = `${config.API_BASE_URl}images/${req.file.filename}`;
-    const newUser = new Users({
-      username: param.username,
-      email: param.email,
-      phonenumber: param.phonenumber,
-      password: param.password,
-      organisation: param.organisation,
-      divisi: param.divisi,
-      class: param.class,
-      nim: param.nim,
-      birthDate: param.birthDate,
-      birthPlace: param.birthPlace,
-      gender: param.gender,
-      role: param.role,
-      image: `${config.API_BASE_URl}images/${req.file.filename}`
-    });
+    const form = new formidable.IncomingForm();
+    form.parse(req, (err, fields, files) => {
+      let oldPath = files.file.path;
+      let newPath = files.file.name ? `public/images/${Date.now() + path.extname(files.file.name)}` : null;
+      let rawData = fs.readFileSync(oldPath);
 
-    Users.findOne({ _id: param.id }, async (err, user) => {
-      if ((!user || err) && req.file.filename) await fs.unlink(path.join(`public/images/${req.file.filename}`));
-      if (!user) return res.status(404).send(responseWrapper(null, 'No data user find to update', 404));
-      if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
-      if (user) {
-        let error = param.option === 'IS_UPDATE_IMAGE' ? null : newUser.validateSync();
-        if (error) {
-          if (req.file.filename) await fs.unlink(path.join(`public/images/${req.file.filename}`));
-          handleValidationError(error, res);
-        } else {
-          if (param.password) param['password'] = bcrypt.hashSync(param.password, 8);
-          Users.updateOne({ _id: param.id }, param, async (err, result) => {
-            if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
-            if (user.image) {
-              try {
-                const imageUri = user.image;
-                await fs.unlink(path.join(`public/${imageUri.split('/')[3]}/${imageUri.split('/')[4]}`));
-              } catch (err) {
-                console.log(err);
-              }
+      fs.writeFile(newPath, rawData, async (err) => {
+        if (err) return res.status(400).send(responseWrapper(null, 'Something went wrong', 400));
+
+        const param = JSON.parse(fields.data);
+        param['image'] = `${config.API_BASE_URl}images/${newPath.replace('public/images/', '')}`;
+        const newUser = new Users({
+          username: param.username,
+          email: param.email,
+          phonenumber: param.phonenumber,
+          password: param.password,
+          organisation: param.organisation,
+          divisi: param.divisi,
+          class: param.class,
+          nim: param.nim,
+          birthDate: param.birthDate,
+          birthPlace: param.birthPlace,
+          gender: param.gender,
+          role: param.role,
+          image: `${config.API_BASE_URl}images/${req.file.filename}`
+        });
+
+        Users.findOne({ _id: param.id }, async (err, user) => {
+          if ((!user || err) && newPath) await fs.unlink(path.join(newPath));
+          if (!user) return res.status(404).send(responseWrapper(null, 'No data user find to update', 404));
+          if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+          if (user) {
+            let error = param.option === 'IS_UPDATE_IMAGE' ? null : newUser.validateSync();
+            if (error) {
+              if (newPath) await fs.unlink(path.join(newPath));
+              handleValidationError(error, res);
+            } else {
+              if (param.password) param['password'] = bcrypt.hashSync(param.password, 8);
+              Users.updateOne({ _id: param.id }, param, async (err, result) => {
+                if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+                if (user.image) {
+                  try {
+                    const imageUri = user.image;
+                    await fs.unlink(path.join(`public/${imageUri.split('/')[3]}/${imageUri.split('/')[4]}`));
+                  } catch (err) {
+                    console.log(err);
+                  }
+                }
+                res.status(200).send(responseWrapper(
+                  { Message: 'Update data User is successfully!' },
+                  'Update data User is successfully!',
+                  200
+                ));
+              });
             }
-            res.status(200).send(responseWrapper(
-              { Message: 'Update data User is successfully!' },
-              'Update data User is successfully!',
-              200
-            ));
-          });
-        }
-      }
+          }
+        });
+      });
     });
   },
 

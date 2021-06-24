@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const { authJwt } = require('../middlewares');
-const { uploadSingle } = require('../middlewares/multer');
 const verifyApiKey = require('../middlewares/verifyApiKey');
 
 const absent = require('../controllers/absensiController');
@@ -14,10 +13,10 @@ router.use(function (req, res, next) {
   next();
 });
 
-router.post('/absent/in', [uploadSingle, verifyApiKey, authJwt.verifyToken], absent.absenIn);
-router.post('/absent/out', [uploadSingle, verifyApiKey, authJwt.verifyToken], absent.absentOut);
+router.post('/absent/in', [verifyApiKey, authJwt.verifyToken], absent.absenIn);
+router.post('/absent/out', [verifyApiKey, authJwt.verifyToken], absent.absentOut);
 router.post('/absent/getAbsents', [verifyApiKey, authJwt.verifyToken], absent.getDataAbsents);
 router.post('/absent/getAbsentById', [verifyApiKey, authJwt.verifyToken], absent.getDataAbsentById);
-router.post('/absent/getLatestAbsents', absent.getLatestDataAbsent);
+router.post('/absent/getLatestAbsents', [verifyApiKey, authJwt.verifyToken], absent.getLatestDataAbsent);
 
 module.exports = router;

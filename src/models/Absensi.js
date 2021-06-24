@@ -8,7 +8,8 @@ const defaultDateWork =
 const absensiScheme = new mongoose.Schema({
   userId: {
     type: ObjectId,
-    ref: 'User'
+    ref: 'User',
+    required: [true, 'User is required']
   },
   userName: {
     type: String,
@@ -29,6 +30,10 @@ const absensiScheme = new mongoose.Schema({
   },
   imageOut: {
     type: String,
+  },
+  location: {
+    type: String,
+    required: [true, 'Location work is required']
   },
   // 1 => IN; 2 => OUT
   status: {

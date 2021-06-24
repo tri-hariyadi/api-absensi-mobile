@@ -2,8 +2,6 @@ const cors = require("cors");
 const express = require('express');
 const createError = require('http-errors');
 const path = require('path');
-const config = require('./src/config/config').get(process.env.NODE_ENV);
-const bodyParser = require('body-parser')
 
 const app = express();
 
@@ -18,10 +16,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors(corsOptions));
 
-app.use(bodyParser.urlencoded({
+app.use(express.urlencoded({
   extended: true
 }));
-app.use(bodyParser.json());
+app.use(express.json());
 
 require('dotenv').config();
 // database connection  
@@ -31,11 +29,13 @@ const userManagement = require('./src/routes/userManagement');
 const absensi = require('./src/routes/absent');
 const kas = require('./src/routes/kas');
 const token = require('./src/routes/token');
+const attandenceTag = require('./src/routes/attendanceTag');
 
 app.use('/api/v1/absensiMobile/', userManagement);
 app.use('/api/v1/absensiMobile/', absensi);
 app.use('/api/v1/absensiMobile/', kas);
 app.use('/api/v1/absensiMobile/', token);
+app.use('/api/v1/absensiMobile/', attandenceTag);
 
 //404 handler and pass to error handler
 app.use((req, res, next) => {

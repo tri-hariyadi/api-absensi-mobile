@@ -22,8 +22,8 @@ module.exports = {
         const absent = new Absensi({
           userId: param.userId,
           userName: param.userName,
+          location: param.location,
           desc: param.desc,
-          dateWork: param.dateWork,
           imageIn: `${config.API_BASE_URl}images/${newPath.replace('public/images/', '')}`
         });
 
@@ -61,14 +61,16 @@ module.exports = {
 
         const param = JSON.parse(fields.data);
         let dataAbsent;
-        await Absensi.findOne(param, (err, absentData) => {
-          if (err) return res.status(400).send(responseWrapper(null, 'Cannot absent out', 400));
+        await Absensi.findOne({ _id: param.id }, (err, absentData) => {
+          if (err) return res.status(500).send(responseWrapper(null, 'Internal server error', 500));
+          if (!absentData) return res.status(400).send(responseWrapper(null, 'Cannot absent out', 400));
           if (absentData) dataAbsent = absentData;
         });
         const absent = new Absensi({
-          userId: param.userId,
-          userName: param.userName,
-          desc: dataAbsent ? dataAbsent.desc : ''
+          userId: dataAbsent.userId,
+          userName: dataAbsent.userName,
+          location: param.location,
+          desc: dataAbsent.desc
         });
 
         if (!files.file) return res.status(400).send(responseWrapper(null, 'Image out is required', 400));
@@ -77,9 +79,9 @@ module.exports = {
           if (newPath) await fs.unlink(path.join(newPath));
           handleValidationError(error, res);
         } else {
-          param['imageOut'] = `${config.API_BASE_URl}images/${req.file.filename}`;
+          param['imageOut'] = `${config.API_BASE_URl}images/${newPath.replace('public/images/', '')}`;
           param['status'] = '2';
-          Absensi.updateOne({ userId: param.userId }, param, async (err, result) => {
+          Absensi.updateOne({ _id: param.id }, param, async (err, result) => {
             if (err) {
               await fs.unlink(path.join(newPath));
               return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
@@ -115,11 +117,8 @@ module.exports = {
   },
 
   getDataAbsentById: (req, res, next) => {
-    Absensi.findOne({
-      userId: req.body.userId,
-      userName: req.body.userName
-    }).exec((err, result) => {
-      if (err) res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+    Absensi.findOne({ _id: req.body.id }).exec((err, result) => {
+      if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
       if (!result) return res.status(404).send(responseWrapper(null, 'Data user is not found', 404))
       if (result) return res.status(200).send(responseWrapper(result, 'Successfully get data user', 200));
     });

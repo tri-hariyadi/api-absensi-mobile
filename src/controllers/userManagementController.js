@@ -51,33 +51,36 @@ module.exports = {
       if (!user) return res.status(404).send(responseWrapper(null, 'Email is not found'));
       if (user) {
         const doc = await Tokens.findOne({ userId: user._id });
-        if (!doc) {
-          let passwordIsValid = bcrypt.compareSync(
-            req.body.password,
-            user.password
-          );
-          if (!passwordIsValid) return res.status(401).send(responseWrapper(null, 'Invalid password', 401));
-          let accessToken = jwt.sign({
-            idUser: user.id,
-            username: user.username,
-            organisation: user.organisation,
-            division: user.divisi,
-            avatar: user.image
-          }, config.SECRET, {
-            expiresIn: 300 // 24 hours
-          });
-
-          let tokens = new Tokens({
-            token: accessToken,
-            userId: user._id
-          });
-          tokens.save((err, result) => {
+        if (doc) {
+          await Tokens.findOneAndDelete({ token: doc.token }, (err, result) => {
             if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
-            res.status(200).send(
-              responseWrapper({ accessToken }, 'Success Login', 200)
-            );
           });
-        } else res.status(400).send(responseWrapper(null, 'Can not login', 400));
+        }
+        let passwordIsValid = bcrypt.compareSync(
+          req.body.password,
+          user.password
+        );
+        if (!passwordIsValid) return res.status(401).send(responseWrapper(null, 'Invalid password', 401));
+        let accessToken = jwt.sign({
+          idUser: user.id,
+          username: user.username,
+          organisation: user.organisation,
+          division: user.divisi,
+          avatar: user.image
+        }, config.SECRET, {
+          expiresIn: 3600 // 24 hours
+        });
+
+        let tokens = new Tokens({
+          token: accessToken,
+          userId: user._id
+        });
+        tokens.save((err, result) => {
+          if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+          res.status(200).send(
+            responseWrapper({ accessToken }, 'Success Login', 200)
+          );
+        });
       }
     });
   },

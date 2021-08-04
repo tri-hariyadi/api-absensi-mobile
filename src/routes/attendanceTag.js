@@ -13,7 +13,7 @@ router.use(function (req, res, next) {
 });
 
 router.post('/attendacetag/add', verifyApiKey, attendanceTagController.addAttendanceTag);
-router.post('/attendacetag/getAll', verifyApiKey, attendanceTagController.getAllAttendanceTag);
+router.get('/attendacetag/getAll', verifyApiKey, attendanceTagController.getAllAttendanceTag);
 router.post('/attendacetag/getById', verifyApiKey, attendanceTagController.getAttendanceTagById);
 router.post('/attendacetag/delete', verifyApiKey, attendanceTagController.deleteAttendanceTag);
 

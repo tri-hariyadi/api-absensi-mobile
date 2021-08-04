@@ -2,6 +2,7 @@ const cors = require("cors");
 const express = require('express');
 const createError = require('http-errors');
 const path = require('path');
+const responseWrapper = require('./src/config/responseWrapper');
 
 const app = express();
 
@@ -39,18 +40,14 @@ app.use('/api/v1/absensiMobile/', attandenceTag);
 
 //404 handler and pass to error handler
 app.use((req, res, next) => {
-  next(createError(404, 'Not found'));
+  // next(createError(404, 'Not found'));
+  res.status(404).send(responseWrapper(null, 'Not Found', 404));
 });
 
 //Error handler
 app.use((err, req, res, next) => {
   res.status(err.status || 500);
-  res.send({
-    error: {
-      status: err.status || 500,
-      message: err.message
-    }
-  });
+  res.send(responseWrapper(null, err.message, err.status || 500));
 });
 
 // const PORT = process.env.PORT || 8081;

@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const { authJwt } = require('../middlewares');
 const verifyApiKey = require('../middlewares/verifyApiKey');
 
 const tokenController = require('../controllers/tokenController');

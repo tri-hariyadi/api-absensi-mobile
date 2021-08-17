@@ -17,6 +17,6 @@ router.post('/absent/in', [verifyApiKey, authJwt.verifyToken], absent.absenIn);
 router.post('/absent/out', [verifyApiKey, authJwt.verifyToken], absent.absentOut);
 router.post('/absent/getAbsents', [verifyApiKey, authJwt.verifyToken], absent.getDataAbsents);
 router.post('/absent/getAbsentById', [verifyApiKey, authJwt.verifyToken], absent.getDataAbsentById);
-router.post('/absent/getLatestAbsents', [verifyApiKey, authJwt.verifyToken], absent.getLatestDataAbsent);
+router.post('/absent/getLatestAbsents', [verifyApiKey], absent.getLatestDataAbsent);
 
 module.exports = router;

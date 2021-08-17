@@ -60,7 +60,7 @@ module.exports = {
           req.body.password,
           user.password
         );
-        if (!passwordIsValid) return res.status(401).send(responseWrapper(null, 'Invalid password', 401));
+        if (!passwordIsValid) return res.status(400).send(responseWrapper(null, 'Invalid password', 400));
         let accessToken = jwt.sign({
           idUser: user.id,
           username: user.username,

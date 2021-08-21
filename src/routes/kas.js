@@ -17,7 +17,7 @@ router.use(function (req, res, next) {
 
 router.post('/kas/insertkas', [verifyApiKey, authJwt.verifyToken], kas.insertKas);
 router.get('/kas/getKas', [verifyApiKey, authJwt.verifyToken], kas.getKas);
-router.post('/kas/kasTransaction', [uploadSingle, verifyApiKey, authJwt.verifyToken], kas.kasTransaction);
+router.post('/kas/kasTransaction', [verifyApiKey, authJwt.verifyToken], kas.kasTransaction);
 router.post('/kas/kasVerify', [verifyApiKey, authJwt.verifyToken], kas.updateKasTransaction);
 router.post('/kas/getKasTransaction', [verifyApiKey, authJwt.verifyToken], kas.getKasTransaction);
 

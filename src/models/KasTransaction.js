@@ -37,6 +37,14 @@ const kasTransactionScheme = new mongoose.Schema({
     },
     required: [true, 'Status payment is required'],
     default: 'processing'
+  },
+  typeTransaction: {
+    type: String,
+    enum: {
+      values: ['spend', 'income'],
+      message: 'Only spend and income is supported for status field'
+    },
+    required: [true, 'Type Transaction is required']
   }
 });
 

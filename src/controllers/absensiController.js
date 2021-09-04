@@ -187,6 +187,27 @@ module.exports = {
       if (dataAbsents) dataAbsents[Object.keys(dataAbsents)[0]].sort((a, b) => new Date(b.dateWork) - new Date(a.dateWork));
       res.status(200).send(responseWrapper(dataAbsents, 'Success get data absents', 200));
     });
+  },
+
+  absencePermission: (req, res, next) => {
+    const absent = new Absensi({
+      userId: req.body.userId,
+      userName: req.body.userName,
+      location: 'none',
+      desc: req.body.desc,
+      status: req.body.status
+    });
+    let error = absent.validateSync();
+    if (error) handleValidationError(error, res);
+    else absent.save(async (err, absensi) => {
+      if (err)
+        return res.status(500).send(responseWrapper(null, err, 500));
+      res.status(200).send(responseWrapper(
+        { Message: 'Successfully add absence permission!' },
+        'Successfully add absence permission!',
+        200
+      ));
+    });
   }
 }
 

@@ -154,8 +154,8 @@ module.exports = {
     if (!req.body.userId) delete param['userId'];
     KasTrans.find(param, (err, dataKasTransaction) => {
       if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
-      else if (dataKasTransaction.length <= 0) return res.status(404).send(responseWrapper(null, 'Data transactions is not found', 404));
-      else return res.status(200).send(responseWrapper(dataKasTransaction, 'Successfully get data kas transactions', 200));
+      if (dataKasTransaction.length <= 0) return res.status(404).send(responseWrapper(null, 'Data transactions is not found', 404));
+      res.status(200).send(responseWrapper(dataKasTransaction, 'Successfully get data kas transactions', 200));
     });
   }
 }

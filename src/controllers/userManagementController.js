@@ -110,7 +110,7 @@ module.exports = {
           birthPlace: param.birthPlace,
           gender: param.gender,
           role: param.role,
-          image: `${config.API_BASE_URl}images/${req.file.filename}`
+          image: `${config.API_BASE_URl}images/${newPath.replace('public/images/', '')}`
         });
 
         Users.findOne({ _id: param.id }, async (err, user) => {

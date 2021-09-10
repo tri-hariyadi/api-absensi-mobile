@@ -101,7 +101,7 @@ module.exports = {
           username: param.username,
           email: param.email,
           phonenumber: param.phonenumber,
-          password: param.password,
+          // password: param.password,
           organisation: param.organisation,
           divisi: param.divisi,
           class: param.class,

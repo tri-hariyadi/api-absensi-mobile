@@ -158,5 +158,13 @@ module.exports = {
     } else {
       return res.status(403).send(responseWrapper(null, 'Can not get all users', 403));
     }
+  },
+
+  getUserById: (req, res, next) => {
+    Users.findOne({ _id: req.body.id }, (err, user) => {
+      if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+      else if (!user) return res.status(404).send(responseWrapper(null, 'Data user is not found', 404));
+      return res.status(200).send(responseWrapper(user, 'Success get data user', 200));
+    });
   }
 }

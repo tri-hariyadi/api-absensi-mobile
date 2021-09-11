@@ -113,8 +113,8 @@ module.exports = {
           let error = newUser.validateSync();
           if (error) handleValidationError(error, res);
           else {
-            if (param.password) param['password'] = bcrypt.hashSync(param.password, 8);
-            Users.updateOne({ _id: param.id }, newUser, async (err, result) => {
+            if (req.body.password) param['password'] = bcrypt.hashSync(req.body.password, 8);
+            Users.updateOne({ _id: req.body.id }, newUser, async (err, result) => {
               if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
               res.status(200).send(responseWrapper(
                 { Message: 'Update data User is successfully!' },

@@ -101,7 +101,7 @@ module.exports = {
           username: param.username,
           email: param.email,
           phonenumber: param.phonenumber,
-          // password: param.password,
+          password: param.password,
           organisation: param.organisation,
           divisi: param.divisi,
           class: param.class,
@@ -119,7 +119,7 @@ module.exports = {
           if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
           if (user) {
             let error = param.option === 'IS_UPDATE_IMAGE' ? null : newUser.validateSync();
-            if (error) {
+            if (error && param.password) {
               if (newPath) await fs.unlink(path.join(newPath));
               handleValidationError(error, res);
             } else {

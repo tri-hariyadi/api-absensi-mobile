@@ -113,8 +113,9 @@ module.exports = {
           let error = newUser.validateSync();
           if (error) handleValidationError(error, res);
           else {
-            console.log(newUser);
+            delete newUser['_id'];
             if (newUser.password) newUser['password'] = bcrypt.hashSync(newUser.password, 8);
+            console.log(newUser);
             Users.updateOne({ _id: req.body.id }, newUser, (err, result) => {
               if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error2', 500));
               res.status(200).send(responseWrapper(

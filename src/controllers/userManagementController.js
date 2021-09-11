@@ -108,7 +108,7 @@ module.exports = {
       const newParam = JSON.parse(JSON.stringify(req.body))
 
       Users.findOne({ _id: req.body.id }, async (err, user) => {
-        if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error1', 500));
+        if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
         else if (!user) return res.status(404).send(responseWrapper(null, 'No data user find to update', 404));
         else if (user) {
           let error = newUser.validateSync();
@@ -116,9 +116,8 @@ module.exports = {
           else {
             delete newParam['id'];
             if (newParam.password) newParam['password'] = bcrypt.hashSync(newParam.password, 8);
-            console.log(newParam);
             Users.updateOne({ _id: req.body.id }, newParam, (err, result) => {
-              if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error2', 500));
+              if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
               res.status(200).send(responseWrapper(
                 { Message: 'Update data User is successfully!' },
                 'Update data User is successfully!',

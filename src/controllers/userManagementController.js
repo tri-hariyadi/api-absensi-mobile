@@ -86,6 +86,7 @@ module.exports = {
   },
 
   updateUser: async (req, res, next) => {
+    console.log(req.body);
     const form = new formidable.IncomingForm();
     form.parse(req, (err, fields, files) => {
       let oldPath = files.file.path;

@@ -105,6 +105,7 @@ module.exports = {
         gender: req.body.gender,
         role: req.body.role,
       });
+      const newParam = JSON.parse(JSON.stringify(req.body))
 
       Users.findOne({ _id: req.body.id }, async (err, user) => {
         if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error1', 500));
@@ -113,10 +114,10 @@ module.exports = {
           let error = newUser.validateSync();
           if (error) handleValidationError(error, res);
           else {
-            delete newUser['_id'];
-            if (newUser.password) newUser['password'] = bcrypt.hashSync(newUser.password, 8);
-            console.log(newUser);
-            Users.updateOne({ _id: req.body.id }, newUser, (err, result) => {
+            delete newParam['id'];
+            if (newParam.password) newParam['password'] = bcrypt.hashSync(newParam.password, 8);
+            console.log(newParam);
+            Users.updateOne({ _id: req.body.id }, newParam, (err, result) => {
               if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error2', 500));
               res.status(200).send(responseWrapper(
                 { Message: 'Update data User is successfully!' },

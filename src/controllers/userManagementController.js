@@ -27,6 +27,9 @@ module.exports = {
       role: req.body.role
     });
 
+    if (!req.body.password) return res.status(400).send(responseWrapper(null, 'Password is required', 400));
+    else if (req.body.password && req.body.password.length < 8) return res.status(400).send(responseWrapper(null, 'Password minimum 8 characters', 400));
+
     let error = user.validateSync();
     if (error) {
       handleValidationError(error, res);
@@ -86,54 +89,66 @@ module.exports = {
   },
 
   updateUser: async (req, res, next) => {
-    console.log(req.body);
-    const form = new formidable.IncomingForm();
-    form.parse(req, (err, fields, files) => {
-      let oldPath = files.file.path;
-      let newPath = files.file.name ? `public/images/${Date.now() + path.extname(files.file.name)}` : null;
-      let rawData = fs.readFileSync(oldPath);
+    const reqFromBody = Object.keys(req.body).length > 0;
+    if (reqFromBody) {
+      const newUser = new Users({
+        username: req.body.username,
+        email: req.body.email,
+        phonenumber: req.body.phonenumber,
+        password: req.body.password,
+        organisation: req.body.organisation,
+        divisi: req.body.divisi,
+        class: req.body.class,
+        nim: req.body.nim,
+        birthDate: req.body.birthDate,
+        birthPlace: req.body.birthPlace,
+        gender: req.body.gender,
+        role: req.body.role,
+      });
 
-      fs.writeFile(newPath, rawData, async (err) => {
-        if (err) return res.status(400).send(responseWrapper(null, 'Something went wrong', 400));
+      Users.findOne({ _id: req.body.id }, async (err, user) => {
+        if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+        else if (!user) return res.status(404).send(responseWrapper(null, 'No data user find to update', 404));
+        else if (user) {
+          let error = newUser.validateSync();
+          if (error) handleValidationError(error, res);
+          else {
+            if (param.password) param['password'] = bcrypt.hashSync(param.password, 8);
+            Users.updateOne({ _id: param.id }, newUser, async (err, result) => {
+              if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+              res.status(200).send(responseWrapper(
+                { Message: 'Update data User is successfully!' },
+                'Update data User is successfully!',
+                200
+              ));
+            });
+          }
+        }
+      })
+    } else {
+      const form = new formidable.IncomingForm();
+      form.parse(req, (err, fields, files) => {
+        let oldPath = files.file.path;
+        let newPath = files.file.name ? `public/images/${Date.now() + path.extname(files.file.name)}` : null;
+        let rawData = fs.readFileSync(oldPath);
 
-        const param = JSON.parse(fields.data);
-        param['image'] = `${config.API_BASE_URl}images/${newPath.replace('public/images/', '')}`;
-        const newUser = new Users({
-          username: param.username,
-          email: param.email,
-          phonenumber: param.phonenumber,
-          password: param.password,
-          organisation: param.organisation,
-          divisi: param.divisi,
-          class: param.class,
-          nim: param.nim,
-          birthDate: param.birthDate,
-          birthPlace: param.birthPlace,
-          gender: param.gender,
-          role: param.role,
-          image: `${config.API_BASE_URl}images/${newPath.replace('public/images/', '')}`
-        });
+        fs.writeFile(newPath, rawData, async (err) => {
+          if (err) return res.status(400).send(responseWrapper(null, 'Something went wrong', 400));
+          const param = JSON.parse(fields.data);
+          param['image'] = `${config.API_BASE_URl}images/${newPath.replace('public/images/', '')}`;
 
-        Users.findOne({ _id: param.id }, async (err, user) => {
-          if ((!user || err) && newPath) await fs.unlink(path.join(newPath));
-          if (!user) return res.status(404).send(responseWrapper(null, 'No data user find to update', 404));
-          if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
-          if (user) {
-            let error = param.option === 'IS_UPDATE_IMAGE' ? null : newUser.validateSync();
-            if (error && param.password) {
-              if (newPath) await fs.unlink(path.join(newPath));
-              handleValidationError(error, res);
-            } else {
-              if (param.password) param['password'] = bcrypt.hashSync(param.password, 8);
+          Users.findOne({ _id: param.id }, async (err, user) => {
+            if ((!user || err) && newPath) await fs.unlink(path.join(newPath));
+            if (!user) return res.status(404).send(responseWrapper(null, 'No data user find to update', 404));
+            if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+            if (user) {
               Users.updateOne({ _id: param.id }, param, async (err, result) => {
                 if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
                 if (user.image) {
                   try {
                     const imageUri = user.image;
                     await fs.unlink(path.join(`public/${imageUri.split('/')[3]}/${imageUri.split('/')[4]}`));
-                  } catch (err) {
-                    console.log(err);
-                  }
+                  } catch (err) { }
                 }
                 res.status(200).send(responseWrapper(
                   { Message: 'Update data User is successfully!' },
@@ -142,10 +157,10 @@ module.exports = {
                 ));
               });
             }
-          }
+          });
         });
       });
-    });
+    }
   },
 
   getAllUsers: async (req, res, next) => {
@@ -165,7 +180,8 @@ module.exports = {
     Users.findOne({ _id: req.body.id }, (err, user) => {
       if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
       else if (!user) return res.status(404).send(responseWrapper(null, 'Data user is not found', 404));
-      return res.status(200).send(responseWrapper(user, 'Success get data user', 200));
+      delete user['password'];
+      res.status(200).send(responseWrapper(user, 'Success get data user', 200));
     });
   }
 }

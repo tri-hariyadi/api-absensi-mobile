@@ -1,9 +1,9 @@
 const mongose = require('mongoose');
 
 const phoneValidators = [
-  { validator: function (v) { return v.length >= 10 }, msg: 'Phone Number must not be less than 10 digits'},
-  { validator: function (v) { return v.length <= 15 }, msg: 'Phone Number must not exceed 15 digits'},
-  { validator: function (v) { return /^[0-9]+$/.test(v) }, msg: 'Phone Number is invalid'}
+  { validator: function (v) { return v.length >= 10 }, msg: 'Phone Number must not be less than 10 digits' },
+  { validator: function (v) { return v.length <= 15 }, msg: 'Phone Number must not exceed 15 digits' },
+  { validator: function (v) { return /^[0-9]+$/.test(v) }, msg: 'Phone Number is invalid' }
 ]
 
 const userScheme = new mongose.Schema({
@@ -32,8 +32,8 @@ const userScheme = new mongose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Password is required'],
-    minlength: [8, 'Password minimum 8 characters'],
+    // required: [true, 'Password is required'],
+    // minlength: [8, 'Password minimum 8 characters'],
   },
   organisation: {
     type: String,

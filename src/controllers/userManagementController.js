@@ -4,6 +4,7 @@ const Tokens = require("../models/Tokens");
 const responseWrapper = require('../config/responseWrapper');
 const handleValidationError = require('../config/handleValidationError');
 
+const nodemailer = require('nodemailer');
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const formidable = require('formidable');
@@ -37,6 +38,33 @@ module.exports = {
       user['password'] = bcrypt.hashSync(req.body.password, 8);
       user.save((err, user) => {
         if (err) return res.status(500).send(responseWrapper(null, err, 500));
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: 'trihariyadi24@gmail.com',
+            pass: 'dewitri1996'
+          }
+        });
+
+        const mailOptions = {
+          from: 'youremail@gmail.com',
+          to: req.body.email,
+          subject: 'Absensi Mobile Register User',
+          html: `
+            <h2>Hello ${req.body.username}</h2>
+            </br>
+            <p>This is Password for login to Absensi Mobile, do not share or distribute to anyone</p>
+            </br>
+            <p>Password: ${req.body.password}</p>
+            </br>
+            <p>Thank You</p>
+          `
+        };
+
+        transporter.sendMail(mailOptions, (err, info) => {
+          if (err) throw err;
+          console.log('Email sent: ' + info.response);
+        });
         res.status(200).send(responseWrapper(
           { Message: 'User was registered successfully!' },
           'User was registered successfully!',

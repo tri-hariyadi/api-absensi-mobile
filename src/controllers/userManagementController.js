@@ -39,10 +39,12 @@ module.exports = {
       user.save((err, user) => {
         if (err) return res.status(500).send(responseWrapper(null, err, 500));
         const transporter = nodemailer.createTransport({
-          service: 'gmail',
+          host: "smtp.gmail.com",
+          port: 465,
+          secure: true,
           auth: {
-            user: 'trihariyadi24@gmail.com',
-            pass: 'dewitri1996'
+            user: process.env.EMAIL_USERNAME,
+            pass: process.env.EMAIL_PASSWORD
           }
         });
 

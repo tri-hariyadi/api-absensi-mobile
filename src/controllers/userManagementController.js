@@ -39,9 +39,7 @@ module.exports = {
       user.save((err, user) => {
         if (err) return res.status(500).send(responseWrapper(null, err, 500));
         const transporter = nodemailer.createTransport({
-          host: "smtp.gmail.com",
-          port: 465,
-          secure: true,
+          service: 'gmail',
           auth: {
             user: process.env.EMAIL_USERNAME,
             pass: process.env.EMAIL_PASSWORD
@@ -49,7 +47,7 @@ module.exports = {
         });
 
         const mailOptions = {
-          from: 'youremail@gmail.com',
+          from: 'no-replay@gmail.com',
           to: req.body.email,
           subject: 'Absensi Mobile Register User',
           html: `

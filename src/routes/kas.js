@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const { authJwt } = require('../middlewares');
-const { uploadSingle } = require('../middlewares/multer');
 const verifyApiKey = require('../middlewares/verifyApiKey');
 
 const kas = require('../controllers/kasController');
@@ -20,6 +19,7 @@ router.get('/kas/getKas', [verifyApiKey, authJwt.verifyToken], kas.getKas);
 router.post('/kas/kasTransaction', [verifyApiKey, authJwt.verifyToken], kas.kasTransaction);
 router.post('/kas/kasVerify', [verifyApiKey, authJwt.verifyToken], kas.updateKasTransaction);
 router.post('/kas/getKasTransaction', [verifyApiKey, authJwt.verifyToken], kas.getKasTransaction);
+router.post('/kas/deleteKasTransaction', [verifyApiKey, authJwt.verifyToken], kas.deleteKasTransaction);
 
 
 module.exports = router;

@@ -99,7 +99,7 @@ module.exports = {
           division: user.divisi,
           avatar: user.image
         }, config.SECRET, {
-          expiresIn: 200 // 24 hours
+          expiresIn: 3600 // 24 hours
         });
 
         let tokens = new Tokens({

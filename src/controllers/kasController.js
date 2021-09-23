@@ -1,5 +1,6 @@
 const Kas = require('../models/Kas');
 const KasTrans = require('../models/KasTransaction');
+const Users = require('../models/Users');
 const handleValidationError = require('../config/handleValidationError');
 const responseWrapper = require('../config/responseWrapper');
 const config = require('../config/config').get(process.env.NODE_ENV);;
@@ -156,6 +157,49 @@ module.exports = {
       if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
       if (dataKasTransaction.length <= 0) return res.status(404).send(responseWrapper(null, 'Data transactions is not found', 404));
       res.status(200).send(responseWrapper(dataKasTransaction, 'Successfully get data kas transactions', 200));
+    });
+  },
+
+  deleteKasTransaction: async (req, res, next) => {
+    if (!req.body.startDate) return res.status(400).send(responseWrapper(null, 'Start Date is required', 400));
+    if (!req.body.endDate) return res.status(400).send(responseWrapper(null, 'End Date is required', 400));
+    if (!req.body.userId) return res.status(400).send(responseWrapper(null, 'User is required', 400));
+    Users.findOne({ _id: req.body.userId }, (err, user) => {
+      if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+      if (!user) return res.status(404).send(responseWrapper(null, 'User is not found', 404));
+      if (user) {
+        if (user.role === '1') {
+          const param = {
+            dateTransaction: {
+              $gte: new Date(req.body.startDate),
+              $lte: new Date(req.body.endDate)
+            }
+          }
+
+          await KasTrans.find(param, async (err, result) => {
+            if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+            if (!result) return res.status(404).send(responseWrapper(null, 'Data kas transaction not found', 404));
+            if (result) {
+              result.forEach(item => {
+                let splitUrl = item.proofPayment.split('/');
+                let pathImg = `public/${splitUrl[3]}/${splitUrl[4]}`;
+                await fs.unlink(path.join(pathImg));
+              })
+            }
+          });
+
+          KasTrans.deleteMany(param, async (err, result) => {
+            if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+            res.status(200).send(responseWrapper({ Message: 'Successfully delete kas transactions' }, 'Successfully delete kas transactions', 200));
+          });
+        } else {
+          res.status(200).send(responseWrapper(
+            { Message: 'User is not have permission to delete kas transaction' },
+            'User is not have permission to delete kas transaction',
+            200
+          ));
+        }
+      }
     });
   }
 }

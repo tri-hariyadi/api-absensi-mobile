@@ -160,11 +160,11 @@ module.exports = {
     });
   },
 
-  deleteKasTransaction: async (req, res, next) => {
+  deleteKasTransaction: (req, res, next) => {
     if (!req.body.startDate) return res.status(400).send(responseWrapper(null, 'Start Date is required', 400));
     if (!req.body.endDate) return res.status(400).send(responseWrapper(null, 'End Date is required', 400));
     if (!req.body.userId) return res.status(400).send(responseWrapper(null, 'User is required', 400));
-    Users.findOne({ _id: req.body.userId }, (err, user) => {
+    Users.findOne({ _id: req.body.userId }, async (err, user) => {
       if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
       if (!user) return res.status(404).send(responseWrapper(null, 'User is not found', 404));
       if (user) {
@@ -180,7 +180,7 @@ module.exports = {
             if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
             if (!result) return res.status(404).send(responseWrapper(null, 'Data kas transaction not found', 404));
             if (result) {
-              result.forEach(item => {
+              result.forEach(async (item) => {
                 let splitUrl = item.proofPayment.split('/');
                 let pathImg = `public/${splitUrl[3]}/${splitUrl[4]}`;
                 await fs.unlink(path.join(pathImg));

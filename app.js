@@ -10,7 +10,9 @@ var corsOptions = {
   origin: '*',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
-  exposedHeaders: ['x-auth-token']
+  exposedHeaders: ['x-auth-token'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 
 app.use(express.static(path.join(__dirname, 'public')));

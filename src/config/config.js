@@ -1,7 +1,7 @@
 const config = {
   production: {
     SECRET: process.env.SECRET,
-    DATABASE: process.env.QOVERY_MONGODB_Z5E39DB5E_DATABASE_URL,
+    DATABASE: process.env.MONGODB_URI,
     APIKEY: process.env.API_KEY,
     API_BASE_URl: process.env.API_BASE_URl
   },

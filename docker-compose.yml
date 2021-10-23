@@ -1,0 +1,44 @@
+version: '3.7'
+
+volumes:
+  mongo_data:
+    external: true
+
+services:
+  mongo:
+    container_name: mongo
+    image: mongo:4.4
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - '27017:27017'
+    env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
+    networks:
+      - absensi_mobile_network
+  apiabsensimobile:
+    container_name: apiabsensimobile
+    image: api-absensi-mobile
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - '8082:8082'
+    depends_on:
+      - mongo
+    env_file: .env
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=$MONGODB_URI
+      - API_KEY=$API_KEY
+      - SECRET=$SECRET
+      - API_BASE_URl=$API_BASE_URl
+    networks:
+      - absensi_mobile_network
+
+networks:
+  absensi_mobile_network:
+    name: absensi_mobile_network

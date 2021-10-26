@@ -25,6 +25,7 @@ module.exports = {
           userName: param.userName,
           location: param.location,
           desc: param.desc,
+          dateWork: `${new Date().getFullYear()}-${String((new Date().getMonth() + 1)).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`,
           imageIn: `${config.API_BASE_URl}images/${newPath.replace('public/images/', '')}`
         });
 
@@ -71,7 +72,8 @@ module.exports = {
           userId: dataAbsent.userId,
           userName: dataAbsent.userName,
           location: param.location,
-          desc: dataAbsent.desc
+          desc: dataAbsent.desc,
+          dateWork: `${new Date().getFullYear()}-${String((new Date().getMonth() + 1)).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`,
         });
 
         if (!files.file) return res.status(400).send(responseWrapper(null, 'Image out is required', 400));
@@ -102,14 +104,14 @@ module.exports = {
     try {
       if (!req.body.startDate) return res.status(400).send(responseWrapper(null, 'Start Date is required', 400));
       if (!req.body.endDate) return res.status(400).send(responseWrapper(null, 'End Date is required', 400));
-      if (!req.body.userId) return res.status(400).send(responseWrapper(null, 'UserId is required', 400));
-      let dataAbsents = await Absensi.find({
-        userId: req.body.userId,
+      let query = {
         dateWork: {
           $gte: new Date(req.body.startDate),
           $lte: new Date(req.body.endDate)
         }
-      });
+      }
+      if (req.body.userId) query.userId = req.body.userId;
+      let dataAbsents = await Absensi.find(query).populate('userId', 'nim divisi username');
       if (dataAbsents.length <= 0) return res.status(404).send(responseWrapper(null, 'Data absents is not found', 404));
       res.status(200).send(responseWrapper(dataAbsents, 'Successfully get data absents', 200));
     } catch (err) {

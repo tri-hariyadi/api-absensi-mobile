@@ -23,7 +23,7 @@ const absensiScheme = new mongoose.Schema({
   dateWork: {
     type: Date,
     required: [true, 'Date work is required'],
-    default: defaultDateWork
+    // default: defaultDateWork
   },
   imageIn: {
     type: String,

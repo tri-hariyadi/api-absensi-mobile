@@ -50,7 +50,6 @@ module.exports = {
 
       fs.writeFile(newPath, rawData, async (err) => {
         if (err) return res.status(400).send(responseWrapper(null, 'Something went wrong', 400));
-        console.log(oldPath);
 
         const param = JSON.parse(fields.data);
         const kasTrans = new KasTrans({
@@ -160,46 +159,66 @@ module.exports = {
     });
   },
 
+  // deleteKasTransaction: (req, res, next) => {
+  //   if (!req.body.startDate) return res.status(400).send(responseWrapper(null, 'Start Date is required', 400));
+  //   if (!req.body.endDate) return res.status(400).send(responseWrapper(null, 'End Date is required', 400));
+  //   if (!req.body.userId) return res.status(400).send(responseWrapper(null, 'User is required', 400));
+  //   Users.findOne({ _id: req.body.userId }, async (err, user) => {
+  //     if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+  //     if (!user) return res.status(404).send(responseWrapper(null, 'User is not found', 404));
+  //     if (user) {
+  //       if (user.role === '1') {
+  //         const param = {
+  //           dateTransaction: {
+  //             $gte: new Date(req.body.startDate),
+  //             $lte: new Date(req.body.endDate)
+  //           }
+  //         }
+
+  //         await KasTrans.find(param, async (err, result) => {
+  //           if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+  //           if (!result) return res.status(404).send(responseWrapper(null, 'Data kas transaction not found', 404));
+  //           if (result) {
+  //             result.forEach(async (item) => {
+  //               let splitUrl = item.proofPayment.split('/');
+  //               let pathImg = `public/${splitUrl[3]}/${splitUrl[4]}`;
+  //               await fs.unlink(path.join(pathImg));
+  //             })
+  //           }
+  //         });
+
+  //         KasTrans.deleteMany(param, async (err, result) => {
+  //           if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+  //           res.status(200).send(responseWrapper({ Message: 'Successfully delete kas transactions' }, 'Successfully delete kas transactions', 200));
+  //         });
+  //       } else {
+  //         res.status(200).send(responseWrapper(
+  //           { Message: 'User is not have permission to delete kas transaction' },
+  //           'User is not have permission to delete kas transaction',
+  //           200
+  //         ));
+  //       }
+  //     }
+  //   });
+  // },
+
   deleteKasTransaction: (req, res, next) => {
-    if (!req.body.startDate) return res.status(400).send(responseWrapper(null, 'Start Date is required', 400));
-    if (!req.body.endDate) return res.status(400).send(responseWrapper(null, 'End Date is required', 400));
-    if (!req.body.userId) return res.status(400).send(responseWrapper(null, 'User is required', 400));
-    Users.findOne({ _id: req.body.userId }, async (err, user) => {
-      if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
-      if (!user) return res.status(404).send(responseWrapper(null, 'User is not found', 404));
-      if (user) {
-        if (user.role === '1') {
-          const param = {
-            dateTransaction: {
-              $gte: new Date(req.body.startDate),
-              $lte: new Date(req.body.endDate)
-            }
-          }
-
-          await KasTrans.find(param, async (err, result) => {
-            if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
-            if (!result) return res.status(404).send(responseWrapper(null, 'Data kas transaction not found', 404));
-            if (result) {
-              result.forEach(async (item) => {
-                let splitUrl = item.proofPayment.split('/');
-                let pathImg = `public/${splitUrl[3]}/${splitUrl[4]}`;
-                await fs.unlink(path.join(pathImg));
-              })
-            }
-          });
-
-          KasTrans.deleteMany(param, async (err, result) => {
-            if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
-            res.status(200).send(responseWrapper({ Message: 'Successfully delete kas transactions' }, 'Successfully delete kas transactions', 200));
-          });
-        } else {
-          res.status(200).send(responseWrapper(
-            { Message: 'User is not have permission to delete kas transaction' },
-            'User is not have permission to delete kas transaction',
-            200
-          ));
-        }
-      }
-    });
+    if (!req.body.role) return res.status(400).send(responseWrapper(null, 'Role is required', 400));
+    if (!req.body.id) return res.status(400).send(responseWrapper(null, 'Id Transaction is required', 400));
+    if (req.body.role === '1') {
+      KasTrans.findOneAndDelete({ _id: req.body.id }, async (err, result) => {
+        if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+        let splitUrl = result.proofPayment.split('/');
+        let pathImg = `public/${splitUrl[3]}/${splitUrl[4]}`;
+        await fs.unlink(path.join(pathImg));
+        res.status(200).send(responseWrapper({ Message: 'Successfully delete kas transactions' }, 'Successfully delete kas transactions', 200));
+      });
+    } else {
+      res.status(400).send(responseWrapper(
+        { Message: 'User is not have permission to delete kas transaction' },
+        'User is not have permission to delete kas transaction',
+        400
+      ));
+    }
   }
 }

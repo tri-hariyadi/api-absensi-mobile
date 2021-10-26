@@ -53,6 +53,8 @@ const userScheme = new mongose.Schema({
   nim: {
     type: String,
     required: [true, 'NIM is required'],
+    unique: true,
+    dropDups: true,
     validate: {
       validator: function (v) {
         return /^[0-9]+$/.test(v);

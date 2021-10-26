@@ -89,6 +89,17 @@ const userScheme = new mongose.Schema({
     required: [true, 'Role is required'],
     default: '0'
   }
+}, {
+  timestamps: {
+    currentTime: () => {
+      var current = new Date();
+      const timeStamp = new Date(Date.UTC(current.getFullYear(),
+        current.getMonth(), current.getDate()));
+      return timeStamp;
+    },
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  },
 });
 
 module.exports = mongose.model('User', userScheme);

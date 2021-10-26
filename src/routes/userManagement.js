@@ -22,5 +22,6 @@ router.delete('/logout', verifyApiKey, tokenController.revokeToken);
 router.post('/update', [verifyApiKey], userManagement.updateUser);
 router.post('/getAllUsers', [authJwt.verifyToken, verifyApiKey], userManagement.getAllUsers);
 router.post('/getUserById', [authJwt.verifyToken, verifyApiKey], userManagement.getUserById);
+router.post('/deleteuser', [authJwt.verifyToken, verifyApiKey], userManagement.deleteUser);
 
 module.exports = router;

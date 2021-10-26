@@ -1,4 +1,5 @@
 const Absensi = require('../models/Absensi');
+const Users = require('../models/Users');
 const handleValidationError = require('../config/handleValidationError');
 const responseWrapper = require('../config/responseWrapper');
 const config = require('../config/config').get(process.env.NODE_ENV);
@@ -208,6 +209,82 @@ module.exports = {
         200
       ));
     });
+  },
+
+  getDataAbsentUsers: async (req, res, next) => {
+    const monts = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    const getDate = (date) => date < 10 ? `0${date}` : date;
+    const DATE_WORK = `${new Date().getFullYear()}-${String((new Date().getMonth() + 1)).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`;
+    const day3 = new Date(new Date(DATE_WORK).setDate(new Date(DATE_WORK).getDate() - 1));
+    const day2 = new Date(new Date(DATE_WORK).setDate(new Date(DATE_WORK).getDate() - 2));
+    const day1 = new Date(new Date(DATE_WORK).setDate(new Date(DATE_WORK).getDate() - 3));
+
+    const month3 = new Date(new Date(DATE_WORK).setMonth(new Date(DATE_WORK).getMonth() - 1));
+    const month2 = new Date(new Date(DATE_WORK).setMonth(new Date(DATE_WORK).getMonth() - 2));
+    const month1 = new Date(new Date(DATE_WORK).setMonth(new Date(DATE_WORK).getMonth() - 3));
+
+    let countUserNotActive = 0;
+    let countUserNotActive3 = 0;
+    let countUserNotActive2 = 0;
+    let countUserNotActive1 = 0;
+    let countUser1 = 0;
+    let countUser2 = 0;
+    let countUser3 = 0;
+    let countUser4 = 0;
+    const RegisteredUser = await Users.countDocuments();
+    const allUsers = await Users.find({}, '_id createdAt');
+    const allAbsents = await Absensi.find({ dateWork: new Date(DATE_WORK) }, 'userId -_id');
+    const allAbsents3 = await Absensi.find({ dateWork: day3 }, 'userId -_id');
+    const allAbsents2 = await Absensi.find({ dateWork: day2 }, 'userId -_id');
+    const allAbsents1 = await Absensi.find({ dateWork: day1 }, 'userId -_id');
+    allUsers.forEach(item => {
+      if (!allAbsents.some(item2 => item2.userId.toString() === item._id.toString())) countUserNotActive++;
+      if (!allAbsents3.some(item3 => item3.userId.toString() === item._id.toString())) countUserNotActive3++;
+      if (!allAbsents2.some(item4 => item4.userId.toString() === item._id.toString())) countUserNotActive2++;
+      if (!allAbsents1.some(item5 => item5.userId.toString() === item._id.toString())) countUserNotActive1++;
+
+      if (item.createdAt && new Date(item.createdAt).toJSON().slice(5, 7) === DATE_WORK.slice(5, 7)) countUser1++;
+      if (item.createdAt && new Date(item.createdAt).toJSON().slice(5, 7) === month3.toJSON().slice(5, 7)) countUser2++;
+      if (item.createdAt && new Date(item.createdAt).toJSON().slice(5, 7) === month2.toJSON().slice(5, 7)) countUser3++;
+      if (item.createdAt && new Date(item.createdAt).toJSON().slice(5, 7) === month1.toJSON().slice(5, 7)) countUser4++;
+    });
+
+    const registeredUser = {
+      // [`${monts[new Date().getMonth()]} ${new Date().getFullYear()}`]: await Users.countDocuments({ createdAt: new Date(DATE_WORK) }),
+      [`${monts[new Date().getMonth()]} ${new Date().getFullYear()}`]: countUser1,
+      [`${monts[new Date().getMonth() - 1]} ${new Date().getFullYear()}`]: countUser2,
+      [`${monts[new Date().getMonth() - 2]} ${new Date().getFullYear()}`]: countUser3,
+      [`${monts[new Date().getMonth() - 3]} ${new Date().getFullYear()}`]: countUser4,
+    }
+
+    const userOnWork = {
+      [`${getDate(new Date().getDate())} ${monts[new Date().getMonth()]} ${new Date().getFullYear()}`]: await Absensi.countDocuments({ dateWork: new Date(DATE_WORK), status: '1' }),
+      [`${getDate(new Date().getDate() - 1)} ${monts[new Date().getMonth()]} ${new Date().getFullYear()}`]: await Absensi.countDocuments({ dateWork: day3, status: '1' }),
+      [`${getDate(new Date().getDate() - 2)} ${monts[new Date().getMonth()]} ${new Date().getFullYear()}`]: await Absensi.countDocuments({ dateWork: day2, status: '1' }),
+      [`${getDate(new Date().getDate() - 3)} ${monts[new Date().getMonth()]} ${new Date().getFullYear()}`]: await Absensi.countDocuments({ dateWork: day1, status: '1' })
+    }
+
+    const userIzin = {
+      [`${getDate(new Date().getDate())} ${monts[new Date().getMonth()]} ${new Date().getFullYear()}`]: await Absensi.countDocuments({ dateWork: new Date(DATE_WORK), status: '3' }),
+      [`${getDate(new Date().getDate() - 1)} ${monts[new Date().getMonth()]} ${new Date().getFullYear()}`]: await Absensi.countDocuments({ dateWork: day3, status: '3' }),
+      [`${getDate(new Date().getDate() - 2)} ${monts[new Date().getMonth()]} ${new Date().getFullYear()}`]: await Absensi.countDocuments({ dateWork: day2, status: '3' }),
+      [`${getDate(new Date().getDate() - 3)} ${monts[new Date().getMonth()]} ${new Date().getFullYear()}`]: await Absensi.countDocuments({ dateWork: day1, status: '3' })
+    }
+
+    const userNotActive = {
+      [`${getDate(new Date().getDate())} ${monts[new Date().getMonth()]} ${new Date().getFullYear()}`]: countUserNotActive,
+      [`${getDate(new Date().getDate() - 1)} ${monts[new Date().getMonth()]} ${new Date().getFullYear()}`]: countUserNotActive3,
+      [`${getDate(new Date().getDate() - 2)} ${monts[new Date().getMonth()]} ${new Date().getFullYear()}`]: countUserNotActive2,
+      [`${getDate(new Date().getDate() - 3)} ${monts[new Date().getMonth()]} ${new Date().getFullYear()}`]: countUserNotActive1,
+    }
+
+    res.status(200).send(responseWrapper({
+      userregistered: registeredUser,
+      useronwork: userOnWork,
+      userizin: userIzin,
+      usernotactive: userNotActive,
+      alluserregistered: RegisteredUser
+    }, 'Success retrieve data absent users', 200));
   }
 }
 

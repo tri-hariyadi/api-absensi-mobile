@@ -14,11 +14,11 @@ const kasTransactionScheme = new mongoose.Schema({
     type: Number,
     required: [true, 'Total payment is required']
   },
-  dateTransaction: {
-    type: Date,
-    required: [true, 'Date transaction is required'],
-    default: new Date()
-  },
+  // dateTransaction: {
+  //   type: Date,
+  //   required: [true, 'Date transaction is required'],
+  //   default: new Date()
+  // },
   desc: {
     type: String,
     required: [true, 'Description is required'],
@@ -46,6 +46,17 @@ const kasTransactionScheme = new mongoose.Schema({
     },
     required: [true, 'Type Transaction is required']
   }
+}, {
+  timestamps: {
+    currentTime: () => {
+      var current = new Date();
+      const timeStamp = new Date(Date.UTC(current.getFullYear(),
+        current.getMonth(), current.getDate()));
+      return timeStamp;
+    },
+    createdAt: 'dateTransaction',
+    updatedAt: 'updatedAt'
+  },
 });
 
 module.exports = mongoose.model('KasTransaction', kasTransactionScheme);

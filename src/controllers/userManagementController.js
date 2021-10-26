@@ -196,14 +196,35 @@ module.exports = {
   getAllUsers: async (req, res, next) => {
     if (req.body.role === '1') {
       try {
-        const allUsers = await Users.find();
-        return res.status(200).send(responseWrapper(allUsers, 'Success get all users', 200));
+        const allUsers = await Users.find({}, '-password');
+        const resultAllUsers = allUsers.filter(item => {
+          if (item.role !== '1') {
+            const registeredDay = JSON.stringify(new Date(item.createdAt)).split('T')[0].replace('"', '');
+            item.createdAt = registeredDay;
+            return item;
+          }
+        });
+        return res.status(200).send(responseWrapper(resultAllUsers, 'Success get all users', 200));
       } catch (err) {
         return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
       }
     } else {
       return res.status(403).send(responseWrapper(null, 'Can not get all users', 403));
     }
+  },
+
+  deleteUser: (req, res, next) => {
+    const form = new formidable.IncomingForm();
+    form.parse(req, (err, fields, files) => {
+      if (!fields.usersId) return res.status(400).send(responseWrapper(null, 'User ID is required', 400));
+      const usersId = JSON.parse(fields.usersId);
+      Users.deleteMany({ _id: { $in: [...usersId] } }, (err) => {
+        if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
+        res.status(200).send(responseWrapper({
+          Message: 'Success delete user'
+        }, 'Success delete user', 200))
+      })
+    });
   },
 
   getUserById: (req, res, next) => {

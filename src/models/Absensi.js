@@ -46,7 +46,17 @@ const absensiScheme = new mongoose.Schema({
     default: '1'
   }
 }, {
-  timestamps: { createdAt: 'timeIn', updatedAt: 'timeOut' },
+  timestamps: {
+    currentTime: () => {
+      var current = new Date();
+      const timeStamp = new Date(Date.UTC(current.getFullYear(),
+        current.getMonth(), current.getDate(), current.getHours(),
+        current.getMinutes(), current.getSeconds(), current.getMilliseconds()));
+      return timeStamp;
+    },
+    createdAt: 'timeIn',
+    updatedAt: 'timeOut'
+  },
 });
 
 module.exports = mongoose.model('Absensi', absensiScheme);

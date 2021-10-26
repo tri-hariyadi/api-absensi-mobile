@@ -106,7 +106,7 @@ module.exports = {
       let prevStatus;
       await KasTrans.findOne({
         userId: req.body.userId,
-        userName: req.body.userName
+        _id: req.body.id
       }, (err, result) => {
         if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
         if (!result) return res.status(404).send(responseWrapper(null, 'Can not find data transaction', 404));

@@ -38,6 +38,7 @@ module.exports = {
       user['password'] = bcrypt.hashSync(req.body.password, 8);
       user.save((err, user) => {
         if (err) return res.status(500).send(responseWrapper(null, err, 500));
+        console.log(`email: ${process.env.EMAIL_USERNAME} - pass: ${process.env.EMAIL_PASSWORD}`);
         const transporter = nodemailer.createTransport({
           service: 'gmail',
           auth: {

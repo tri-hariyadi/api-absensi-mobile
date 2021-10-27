@@ -22,8 +22,5 @@ jobs:
         key: ${{ secrets.SSHKEY }}
         script: | 
         echo ---Building and starting up docker---
-        cd ~/absensi_mobile/api-absensi-mobile/
-        git pull origin master
-        git status
-        docker-compose up -d
+        ls
         echo ---Containers up---

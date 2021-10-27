@@ -24,6 +24,7 @@ jobs:
           cd ~/absensi_mobile/api-absensi-mobile/
           docker-compose down
           docker image rm api-absensi-mobile:latest
+          docker images
           git pull origin master
           git status
           docker-compose up -d

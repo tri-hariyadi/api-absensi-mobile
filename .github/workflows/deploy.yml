@@ -20,4 +20,7 @@ jobs:
         port: ${{ secrets.PORT }}
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSHKEY }}
-        script: ls -all
+        script: | 
+        echo ---Building and starting up docker---
+        docker-compose -f ./api-absensi-mobile/docker-compose.yml up -d
+        echo ---Containers up---

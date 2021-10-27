@@ -21,5 +21,7 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSHKEY }}
         script: | 
-          whoami
-          ls -all
+          cd ~/absensi_mobile/api-absensi-mobile/
+          git pull origin master
+          git status
+          docker-compose up -d

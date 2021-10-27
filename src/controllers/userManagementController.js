@@ -38,7 +38,6 @@ module.exports = {
       user['password'] = bcrypt.hashSync(req.body.password, 8);
       user.save((err, user) => {
         if (err) return res.status(500).send(responseWrapper(null, err, 500));
-        console.log(`email: ${process.env.EMAIL_USERNAME} - pass: ${process.env.EMAIL_PASSWORD}`);
         const transporter = nodemailer.createTransport({
           host: 'smtp.gmail.com',
           port: 465,
@@ -46,12 +45,29 @@ module.exports = {
           auth: {
             type: 'OAuth2',
             user: 'himatif.pbti@gmail.com',
-            clientId: '938106922803-umpiqjlr0rjv07euskf62voqtgcphjm0.apps.googleusercontent.com',
-            clientSecret: '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',
-            refreshToken: '1//04hCJ3jU8yolCCgYIARAAGAQSNwF-L9IreN3DOffR9QQfhnu5Ug-3aD_C56QbmPtR6JmX0T-6Kou10IV1CEn6R30_EFOVkHPBtjU',
-            accessToken: 'ya29.a0ARrdaM-4YPmfgiDoyX8uvKlwpMsdSWzp9LPDy1SGHK8Y9c7T9fK8Y4rW4-nN6JEFhZRkVVW6_pAgQXqWOo7ENxRUiHzZs_KBbomm91MFR9IlvkKoW7Trmmk9hUde4nhSANFv0IRZhYPcCajmM1HkoV12hSZT'
+            clientId: process.env.GMAIL_CLIENT_ID,
+            clientSecret: process.env.GMAIL_SECRET,
+            refreshToken: process.env.GMAIL_REFRESH_TOKEN,
+            accessToken: process.env.GMAIL_ACCESS_TOKEN
           }
         });
+
+        transporter.set('oauth2_provision_cb', (user, renew, callback) => {
+          let accessToken = userTokens[user];
+          if (!accessToken) {
+            return callback(new Error('Unknown user'));
+          } else {
+            return callback(null, accessToken);
+          }
+        });
+
+        transporter.on('token', token => {
+          console.log('A new access token was generated');
+          console.log('User: %s', token.user);
+          console.log('Access Token: %s', token.accessToken);
+          console.log('Expires: %s', new Date(token.expires));
+        });
+
         // const transporter = nodemailer.createTransport({
         //   service: 'gmail',
         //   auth: {
@@ -76,8 +92,18 @@ module.exports = {
         };
 
         transporter.sendMail(mailOptions, (err, info) => {
-          if (err) throw err;
-          console.log('Email sent: ' + info.response);
+          if (err) {
+            console.log(err);
+          } else {
+            // see https://nodemailer.com/usage
+            console.log("info.messageId: " + info.messageId);
+            console.log("info.envelope: " + info.envelope);
+            console.log("info.accepted: " + info.accepted);
+            console.log("info.rejected: " + info.rejected);
+            console.log("info.pending: " + info.pending);
+            console.log("info.response: " + info.response);
+          }
+          transporter.close();
         });
         res.status(200).send(responseWrapper(
           { Message: 'User was registered successfully!' },

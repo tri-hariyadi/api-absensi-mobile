@@ -45,8 +45,11 @@ module.exports = {
           secure: true,
           auth: {
             type: 'OAuth2',
+            user: 'himatif.pbti@gmail.com',
             clientId: '938106922803-umpiqjlr0rjv07euskf62voqtgcphjm0.apps.googleusercontent.com',
-            clientSecret: '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'
+            clientSecret: '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',
+            refreshToken: '1//04hCJ3jU8yolCCgYIARAAGAQSNwF-L9IreN3DOffR9QQfhnu5Ug-3aD_C56QbmPtR6JmX0T-6Kou10IV1CEn6R30_EFOVkHPBtjU',
+            accessToken: 'ya29.a0ARrdaM-4YPmfgiDoyX8uvKlwpMsdSWzp9LPDy1SGHK8Y9c7T9fK8Y4rW4-nN6JEFhZRkVVW6_pAgQXqWOo7ENxRUiHzZs_KBbomm91MFR9IlvkKoW7Trmmk9hUde4nhSANFv0IRZhYPcCajmM1HkoV12hSZT'
           }
         });
         // const transporter = nodemailer.createTransport({

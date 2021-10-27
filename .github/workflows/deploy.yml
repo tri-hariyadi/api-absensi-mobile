@@ -19,4 +19,5 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSHKEY }}
         script: |
-          echo ---Building and starting up docker---
+          whoami
+          ls -al

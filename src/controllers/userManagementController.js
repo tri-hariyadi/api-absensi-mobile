@@ -40,12 +40,22 @@ module.exports = {
         if (err) return res.status(500).send(responseWrapper(null, err, 500));
         console.log(`email: ${process.env.EMAIL_USERNAME} - pass: ${process.env.EMAIL_PASSWORD}`);
         const transporter = nodemailer.createTransport({
-          service: 'gmail',
+          host: 'smtp.gmail.com',
+          port: 465,
+          secure: true,
           auth: {
-            user: process.env.EMAIL_USERNAME,
-            pass: process.env.EMAIL_PASSWORD
+            type: 'OAuth2',
+            clientId: '938106922803-umpiqjlr0rjv07euskf62voqtgcphjm0.apps.googleusercontent.com',
+            clientSecret: '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'
           }
         });
+        // const transporter = nodemailer.createTransport({
+        //   service: 'gmail',
+        //   auth: {
+        //     user: process.env.EMAIL_USERNAME,
+        //     pass: process.env.EMAIL_PASSWORD
+        //   }
+        // });
 
         const mailOptions = {
           from: 'no-replay@gmail.com',

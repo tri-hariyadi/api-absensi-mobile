@@ -2,7 +2,7 @@
 public/.DS_Store
 /node_modules
 /public/images
-# package-lock.json
+package-lock.json
 .env
 ample
 .vercel

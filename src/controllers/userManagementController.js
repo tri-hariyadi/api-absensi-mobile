@@ -138,7 +138,8 @@ module.exports = {
           username: user.username,
           organisation: user.organisation,
           division: user.divisi,
-          avatar: user.image
+          avatar: user.image,
+          role: user.role
         }, config.SECRET, {
           expiresIn: 3600 // 24 hours
         });

@@ -50,6 +50,10 @@ const userScheme = new mongose.Schema({
     required: [true, 'Class is required'],
     maxlength: 50
   },
+  address: {
+    type: String,
+    required: [true, 'Address is required'],
+  },
   nim: {
     type: String,
     required: [true, 'NIM is required'],

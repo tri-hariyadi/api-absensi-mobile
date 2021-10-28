@@ -170,6 +170,7 @@ module.exports = {
         divisi: req.body.divisi,
         class: req.body.class,
         nim: req.body.nim,
+        address: req.body.address,
         birthDate: req.body.birthDate,
         birthPlace: req.body.birthPlace,
         gender: req.body.gender,

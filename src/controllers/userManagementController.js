@@ -96,7 +96,6 @@ module.exports = {
           if (err) {
             console.log(err);
           } else {
-            // see https://nodemailer.com/usage
             console.log("info.messageId: " + info.messageId);
             console.log("info.envelope: " + info.envelope);
             console.log("info.accepted: " + info.accepted);
@@ -141,7 +140,7 @@ module.exports = {
           avatar: user.image,
           role: user.role
         }, config.SECRET, {
-          expiresIn: 100 // 24 hours
+          expiresIn: 3600 // 1 hours
         });
 
         let tokens = new Tokens({

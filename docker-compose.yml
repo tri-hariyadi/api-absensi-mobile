@@ -27,6 +27,8 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - '8082:8082'
+    volumes:
+      - "/root/public/images/:/folder/in/container"
     depends_on:
       - mongo
     env_file: .env

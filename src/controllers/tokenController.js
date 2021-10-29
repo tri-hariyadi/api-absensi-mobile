@@ -30,7 +30,7 @@ module.exports = {
             });
             Tokens.updateOne({ _id: result._id }, { token: newAccessToken }, (err, tokens) => {
               if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
-              res.status(200).send(responseWrapper({ newAccessToken }, 200));
+              res.status(200).send(responseWrapper({ newAccessToken }, 'Success Refresh Token', 200));
             });
           }
         });

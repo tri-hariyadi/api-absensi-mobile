@@ -45,7 +45,7 @@ module.exports = {
       if (err) return res.status(400).send(null, 'Something went wrong', 400);
       if (Object.keys(files).length < 1) return res.status(400).send(responseWrapper(null, 'Proof Payment is required', 400));
       let oldPath = files.file.path;
-      let newPath = files.file.name ? `public/images/${Date.now() + path.extname(files.file.name)}` : null
+      let newPath = files.file.name ? `root/public/images/${Date.now() + path.extname(files.file.name)}` : null
       let rawData = fs.readFileSync(oldPath);
 
       fs.writeFile(newPath, rawData, async (err) => {

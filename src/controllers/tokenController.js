@@ -26,7 +26,7 @@ module.exports = {
               division: decoded.payload.division,
               avatar: decoded.payload.image
             }, config.SECRET, {
-              expiresIn: 3600
+              expiresIn: 100
             });
             Tokens.updateOne({ _id: result._id }, { token: newAccessToken }, (err, tokens) => {
               if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
@@ -43,7 +43,7 @@ module.exports = {
     if (!bearerHeader) return res.status(403).send({ message: "No token provided!" });
     const bearer = bearerHeader.split(' ');
     const bearerToken = bearer[1];
-    
+
     Tokens.findOneAndDelete({ token: bearerToken }, (err, result) => {
       if (err) return res.status(500).send(responseWrapper(null, 'Internal Server Error', 500));
       if (!result) return res.status(401).send({ message: "Invalid token!" });

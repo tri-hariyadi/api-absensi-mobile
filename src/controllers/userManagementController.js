@@ -141,7 +141,7 @@ module.exports = {
           avatar: user.image,
           role: user.role
         }, config.SECRET, {
-          expiresIn: 3600 // 24 hours
+          expiresIn: 100 // 24 hours
         });
 
         let tokens = new Tokens({

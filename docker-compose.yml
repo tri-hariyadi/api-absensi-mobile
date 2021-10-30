@@ -3,8 +3,6 @@ version: '3.7'
 volumes:
   mongo_data:
     external: true
-  media:
-    external: true
 
 services:
   mongo:
@@ -29,8 +27,8 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - '8082:8082'
-    volumes:
-      -  media:/home/node/app/public/images
+    # volumes:
+    #   -  media:/home/node/app/public/images
     depends_on:
       - mongo
     env_file: .env

@@ -28,7 +28,7 @@ services:
     ports:
       - '8082:8082'
     volumes:
-      - /root/public/images/:/home/node/app/public/images
+      -  images:/home/node/app/public/images
     depends_on:
       - mongo
     env_file: .env
